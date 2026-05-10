@@ -1,7 +1,7 @@
 const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 dotenv.config()
 const uri = process.env.MONGODB_URI
 const app = express()
@@ -31,6 +31,39 @@ async function run() {
     app.post('/destination', async(req, res)=>{
       const destinationData = req.body
       const result = await destinationCollection.insertOne(destinationData)
+      res.send(result)
+    })
+
+    app.get('/destination/:id', async(req, res)=>{
+      const id = req.params.id
+      const query ={
+        _id: new ObjectId(id)
+      }
+      const result = await destinationCollection.findOne(query)
+      res.send(result)
+    })
+
+    app.patch('/destination/:id', async(req, res)=>{
+      const id = req.params.id
+      const query={
+        _id:  new ObjectId(id)
+      }
+      const update = req.body
+      const updated = {
+        $set:{
+          ...update
+        }
+      }
+    const result = await destinationCollection.updateOne(query, updated)
+    res.send(result)
+    })
+
+    app.delete('/destination/:id', async(req, res)=>{
+      const id = req.params.id
+      const query = {
+        _id: new ObjectId(id)
+      }
+      const result = await destinationCollection.deleteOne(query)
       res.send(result)
     })
 
