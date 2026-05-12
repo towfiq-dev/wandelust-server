@@ -22,7 +22,13 @@ async function run() {
     await client.connect();
     const db = client.db('wanderlust')
     const destinationCollection = db.collection('destinations')
+    const bookingsCollection = db.collection('bookings')
 
+    app.post('/bookings', async(req, res)=>{
+      const bookingsData = req.body
+      const result = await bookingsCollection.insertOne(bookingsData)
+      res.send(result)
+    })
     app.get('/destination', async(req,res)=>{
       const destination = await destinationCollection.find().toArray()
       res.send(destination)
