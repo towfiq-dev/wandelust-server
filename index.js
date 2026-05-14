@@ -5,6 +5,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 const port = process.env.PORT
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { createRemoteJWKSet, jwtVerify } = require('jose-cjs')
 const uri = process.env.MONGODB_URI
 
 app.use(cors())
@@ -16,18 +17,33 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
-
-const verifyToken = (req, res, next)=>{
+  const JWKS = createRemoteJWKSet(
+      new URL(`${process.env.CLIENT_URL}/api/auth/jwks`))
+const verifyToken = async(req, res, next)=>{
   const authHeader = req?.headers.authorization
+  if (!authHeader) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
   const token = authHeader.split(" ")[1]
-  console.log(token);
-  
+  if (!token) {
+    return res.status(401).json({
+      message: "Unauthorized"
+    })
+  }
+  try{
+    const {payload} = await jwtVerify(token, JWKS)
+    //console.log(payload);
+    
+  next()
+  }catch (error){
+    return res.status(403).json({message: "Forbidden"})
+  }
 }
 
 async function run() {
   try {
 
-    await client.connect();
+    //await client.connect();
 
     const db = client.db("wanderlust");
     const destinationCollection = db.collection("destination");
@@ -39,7 +55,7 @@ async function run() {
       res.send(result)
     })
 
-    app.post('/bookings', async(req, res)=>{
+    app.post('/bookings', verifyToken, async(req, res)=>{
       const bookings = req.body
       const result = await bookingCollection.insertOne(bookings)
       res.send(result)
@@ -86,7 +102,7 @@ async function run() {
       res.send(result)
     })
 
-    app.delete('/bookings/:id', async(req, res)=>{
+    app.delete('/bookings/:id', verifyToken,  async(req, res)=>{
       const id = req.params.id
       const query = {_id: new ObjectId(id)}
       const result = await bookingCollection.deleteOne(query)
@@ -107,7 +123,7 @@ async function run() {
       res.send(result)
     })
 
-    await client.db("admin").command({ ping: 1 });
+    //await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
 
