@@ -52,7 +52,8 @@ async function run() {
     const destinationCollection = db.collection("destination");
     const bookingCollection = db.collection("bookings");
 
-    app.post('/destination', async(req, res)=>{
+    app.post('/destination', verifyToken,
+      async(req, res)=>{
       const destinationData = req.body
       const result = await destinationCollection.insertOne(destinationData)
       res.send(result)
@@ -64,7 +65,8 @@ async function run() {
       res.send(result)
     })
 
-    app.get('/bookings/:userId', async(req, res)=>{
+    app.get('/bookings/:userId', verifyToken,
+      async(req, res)=>{
       const userId = req.params.userId
       const query = {userId: userId}
       const result = await bookingCollection.find(query).toArray()
