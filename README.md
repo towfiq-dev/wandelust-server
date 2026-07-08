@@ -42,8 +42,8 @@ This server acts as the core data and business-logic layer of the Wanderlust tra
 | Method | Endpoint | Protected | Description |
 |---|---|---|---|
 | `POST` | `/destination` | ✅ | Add a new destination |
-| `GET` | `/destination` | ❌ | Get all destinations |
-| `GET` | `/featured` | ❌ | Get top 10 featured destinations |
+| `GET` | `/destination` | ✅ | Get all destinations |
+| `GET` | `/featured` | ✅ | Get top 10 featured destinations |
 | `GET` | `/destination/:id` | ✅ | Get a single destination by ID |
 | `PATCH` | `/destination/:id` | ✅ | Update a destination |
 | `DELETE` | `/destination/:id` | ✅ | Delete a destination |
