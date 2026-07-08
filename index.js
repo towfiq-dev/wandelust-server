@@ -115,7 +115,6 @@ async function run() {
     // ─── ADMIN ROUTES ────────────────────────────────────────────────
     // NOTE: These are admin-only endpoints. In production, add role-based
     //       authorization to ensure only admins can access these.
-
     // Get ALL bookings (admin view)
     app.get('/admin/bookings', verifyToken, async(req, res)=>{
       const result = await bookingCollection.find().toArray()
